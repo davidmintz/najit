@@ -2,20 +2,97 @@
 declare(strict_types=1);
 
 namespace  App\Service;
+use GuzzleHttp\Client;
 
 class Invitation
 {
     
     private $config;
 
+    /** @var GuzzleHttp\Client */
+    private $client;
+
     public function __construct(Array $config)
     {
         $this->config = $config;
+        $this->init();
     }
 
     public function getConfig() : Array
     {
         return $this->config;
+    }
+
+    private function init()
+    {
+        $this->client = new Client();
+
+    }
+
+    /**
+     * Gets NeonCRM session id
+     *
+     * @return String
+     */
+    public function login() : String
+    {
+        $endpoint = $this->config['neoncrm.base_uri'] . '/common/login';
+        $res = $this->client->request('GET',$endpoint,[
+           'query'=>[
+            'login.apiKey' => $this->config['neoncrm.api_key'],
+            'login.orgid' => $this->config['neoncrm.api_id'],
+           ] 
+        ]);
+
+        $response = json_decode((string)$res->getBody());
+        $result = $response->loginResponse;
+        if ('SUCCESS' != $result->operationResult) {
+            throw new \EXception('login operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
+        }
+
+        return $result->userSessionId;
+    }
+    /** for initial testing/debugging */
+    public function doShit()
+    {
+        $session_id = $this->login();
+        $endpoint = $this->config['neoncrm.base_uri'] . '/account/listAccounts';
+        $query_parts = [
+            "userSessionId=$session_id",
+            "userSessionId=5d7acebbd84f2963b52e4f4f34931e44",
+            'responseType=json',
+            'responseType=json',
+            'userSessionId=$KEY',            
+            'searches.search.key=Email',
+            'searches.search.searchOperator=EQUAL',
+            'searches.search.value=natasha.bonilla@gmail.com',
+            // 'searches.search.value=david@davidmintz.org',
+            'outputfields.idnamepair.id=',
+            'outputfields.idnamepair.name=Membership%20Expiration%20Date',
+            'outputfields.idnamepair.id=',
+            'outputfields.idnamepair.name=Account%20ID',
+            'outputfields.idnamepair.id=',
+            'outputfields.idnamepair.name=First%20Name',
+            'outputfields.idnamepair.id=',
+            'outputfields.idnamepair.name=Last%20Name',
+            'outputfields.idnamepair.id=',
+            'outputfields.idnamepair.name=Email%201',
+        ];
+        $string = implode('&',$query_parts);
+        $endpoint .= '?' . $string;
+        $res = $this->client->request('GET',$endpoint);
+        $response = json_decode((string)$res->getBody());
+
+        return $response;
+
+
+
+    }
+
+    public function verifyMembership(String $email)
+    {
+
+
     }
 
 

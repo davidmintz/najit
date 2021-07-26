@@ -13,8 +13,10 @@ class IndexController extends AbstractController {
      */
      public function index(Invitation $invitation) : Response
      {
-        dump($invitation->getConfig());
-        return new Response(sprintf("<html><body>%s</body></html>","Hello fuckin' world. We instantiated a ".get_class($invitation)));
+        //dump($invitation->getConfig());
+        //dump($invitation->login());
+        dump($invitation->doShit()->listAccountsResponse->searchResults->nameValuePairs);
+        return new Response(sprintf("<html><body>%s</body></html>","Hello fuckin' world."));
      }
 
 }
