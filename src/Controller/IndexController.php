@@ -16,7 +16,7 @@ class IndexController extends AbstractController {
         //dump($invitation->getConfig());
         //dump($invitation->login());
         dump($invitation->doShit()->listAccountsResponse->searchResults->nameValuePairs);
-        return new Response(sprintf("<html><body>%s</body></html>","Hello fuckin' world."));
+        return new Response(sprintf("<html><body>%s</body></html>","Woo hoo!"));
      }
 
 }
