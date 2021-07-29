@@ -13,17 +13,15 @@ class IndexController extends AbstractController {
      */
      public function index(Invitation $invitation) : Response
      {
-        //dump($invitation->getConfig());
-        //dump($invitation->login());
-      $shit = $invitation
-         ->verifyMembership('info@amirshahilaw.com');
+         // dump("hello?");
+         return $this->render('index.html.twig');  
+         // $shit = $invitation
+         // ->sendInvitation('mintz@vernontbludgeon.com');
+         //->verifyMembership('info@amirshahilaw.com');
          //->verifyMembership('david@davidmintz.org');
          //->listAccountsResponse;// ->searchResults;//->nameValuePairs;
-      // $t = '';
-      // foreach ($shit as $s) {
-      //    $t .= print_r($s,true);
-      // }
-        return new Response(sprintf("<html><body><pre>%s</pre></body></html>","Woo hoo!<br>".print_r($shit,true)));
+      
+      //   return new Response(sprintf("<html><body><pre>%s</pre></body></html>","Woo hoo!<br>".print_r($shit,true)));
      }
 
 }

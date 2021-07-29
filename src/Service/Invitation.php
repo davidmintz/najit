@@ -16,6 +16,12 @@ class Invitation
     /** @var  Psr\Log\LoggerInterface */
     private $logger;
 
+    /**
+     * constructor
+     * 
+     * 
+     */
+
     public function __construct(Array $config, LoggerInterface $logger)
     {
         $this->config = $config;
@@ -56,16 +62,20 @@ class Invitation
         }
 
        
-        // return $result->userSessionId;
-        return '37352faafd77d9053b0ed14c48201135';
+        return $result->userSessionId;
+  
     }
-    /** for initial testing/debugging */
-    public function findMember(String $email = null) :? \stdClass
+    /**
+     * queries a NAJIT member record
+     * 
+     * 
+     */
+    public function findMember(String $email) :? \stdClass
     {
         $session_id = $this->login();
         $this->logger->debug('logged in with session id: '.$session_id);
         dump('logged in with session id: '.$session_id);
-        if (! $email ) { $email = 'yarmila13@comcast.net'; }
+        // if (! $email ) { $email = 'yarmila13@comcast.net'; }
         dump ('using email: '.$email);
         $endpoint = $this->config['neoncrm.base_uri'] . '/account/listAccounts';
         $query_parts = [
@@ -91,12 +101,15 @@ class Invitation
         $response = json_decode((string)$res->getBody());
 
         return $response;
-
-
-
     }
 
-    public function verifyMembership(String $email ='info@amirshahilaw.com') : Array
+    /**
+     * checks that $email belongs to an active member
+     * 
+     * @param String $email
+     * @return Array
+     */
+    public function verifyMembership(String $email = 'info@amirshahilaw.com') :? Array
     {
         $session_id = $this->login();
         $result = $this->findMember($email);
@@ -120,7 +133,7 @@ class Invitation
                 if (! $o->value) {
                     //dump("Life member?");
                     $return['valid']= true;
-                } else {//
+                } else {
                     $today = date('Y-m-d');
                     $expiration = $o->value;
                     if ($expiration > $today) {
@@ -129,11 +142,47 @@ class Invitation
                 }
             }
         }
-        
-        return $return;
 
+        return $return;
     }
 
+    public function sendInvitation(String $email) : \stdClass
+    {
+        $endpoint = $this->config['discourse.base_uri'] . '/invites';
+        $headers = [
+            'Api-Key' => $this->config['discourse.api_key'],
+            'Api-Username' => $this->config['discourse.api_username'],
+            'Accept'     => 'application/json', // maybe
+
+        ];
+        try {
+            // first we have to create the invitation, apparently...
+            $res = $this->client->request('POST',$endpoint, [
+                'headers' => $headers
+            ]);
+            $data = json_decode((string)$res->getBody());
+    
+            $id = $data->id;
+            $endpoint .= "/$data->id";
+            dump("gonna PUT $endpoint");
+            // ...then update it to make it get emailed to someone specific
+            $res = $this->client->request('PUT',$endpoint,[
+                'headers' => $headers,
+                'form_params' => [
+                    'email' => $email,  
+                    'custom_message'=>	"This would be your personal message.",
+                    'send_email'=> true,
+                ],
+            ]);
+            $data = json_decode((string)$res->getBody());
+
+            return $data;
+
+        } catch (\Exception $e) {
+            // log it or what have you...
+            throw $e;
+        }   
+    }   
 
 }
 /* 
@@ -192,6 +241,24 @@ topics	[]
 groups	[]
 
 [then...]
+
+
+{
+  "id": 30,
+  "invite_key": "58JURk7cki",
+  "link": "https://najit.courtinterpreter.net/invites/58JURk7cki",
+  "max_redemptions_allowed": 1,
+  "redemption_count": 0,
+  "created_at": "2021-07-29T01:42:55.826Z",
+  "updated_at": "2021-07-29T01:42:55.826Z",
+  "expires_at": "2021-08-28T01:42:55.826Z",
+  "expired": false,
+  "topics": [],
+  "groups": []
+}
+
+
+
 PUT https://najit.courtinterpreter.net/invites/24
 [request parameters]	
 email	"mintz@vernontbludgeon.com"
