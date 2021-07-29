@@ -28,6 +28,7 @@ services:
         arguments:
           - { discourse.api_key: '%env(discourse_api_key)%', 
               discourse.base_uri: 'https://najit.courtinterpreter.net',
+              discourse.api_username : 'davidmintz',
               neoncrm.api_key: '%env(neoncrm_api_key)%',
               neoncrm.base_uri: 'https://api.neoncrm.com/neonws/services/api',
               neoncrm.api_id: 'najit'

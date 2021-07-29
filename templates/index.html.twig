@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+           <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <p>Please use this form to request an invitation to join NAJIT's Discourse discussion site. We will use your email address 
+                    to verify that your NAJIT membership is active and then email you a link that will bring you to the Discourse user registration page.</p>
+                    <form>
+                    <div class="mb-3">
+                        <label for="email"  class="form-label">Email address</label>
+                        <input type="email" placeholder="your_name@example.org"  class="form-control form-control-lg" id="email" aria-describedby="emailHelp">
+                        <div id="emailHelp" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+{% endblock %}
