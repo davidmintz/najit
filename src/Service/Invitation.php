@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace  App\Service;
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 
 class Invitation
 {
@@ -12,9 +13,13 @@ class Invitation
     /** @var GuzzleHttp\Client */
     private $client;
 
-    public function __construct(Array $config)
+    /** @var  Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(Array $config, LoggerInterface $logger)
     {
         $this->config = $config;
+        $this->logger = $logger; 
         $this->init();
     }
 
@@ -47,35 +52,37 @@ class Invitation
         $response = json_decode((string)$res->getBody());
         $result = $response->loginResponse;
         if ('SUCCESS' != $result->operationResult) {
-            throw new \EXception('login operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
+            throw new \Exception('login operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
         }
 
-        return $result->userSessionId;
+       
+        // return $result->userSessionId;
+        return '37352faafd77d9053b0ed14c48201135';
     }
     /** for initial testing/debugging */
-    public function doShit()
+    public function findMember(String $email = null) :? \stdClass
     {
         $session_id = $this->login();
+        $this->logger->debug('logged in with session id: '.$session_id);
+        dump('logged in with session id: '.$session_id);
+        if (! $email ) { $email = 'yarmila13@comcast.net'; }
+        dump ('using email: '.$email);
         $endpoint = $this->config['neoncrm.base_uri'] . '/account/listAccounts';
         $query_parts = [
             "userSessionId=$session_id",
-            "userSessionId=5d7acebbd84f2963b52e4f4f34931e44",
-            'responseType=json',
-            'responseType=json',
-            'userSessionId=$KEY',            
+            'responseType=json',         
             'searches.search.key=Email',
-            'searches.search.searchOperator=EQUAL',
-            'searches.search.value=natasha.bonilla@gmail.com',
-            // 'searches.search.value=david@davidmintz.org',
-            'outputfields.idnamepair.id=',
-            'outputfields.idnamepair.name=Membership%20Expiration%20Date',
-            'outputfields.idnamepair.id=',
+            'searches.search.searchOperator=EQUAL', //CONTAIN
+            // 'searches.search.value=natasha.bonilla@gmail.com',
+            // yarmila13@comcast.net
+            // info@amirshahilaw.com
+            // amirshahi@y7mail.com
+            'searches.search.value='.$email,
             'outputfields.idnamepair.name=Account%20ID',
             'outputfields.idnamepair.id=',
+            'outputfields.idnamepair.name=Membership%20Expiration%20Date',
             'outputfields.idnamepair.name=First%20Name',
-            'outputfields.idnamepair.id=',
             'outputfields.idnamepair.name=Last%20Name',
-            'outputfields.idnamepair.id=',
             'outputfields.idnamepair.name=Email%201',
         ];
         $string = implode('&',$query_parts);
@@ -89,15 +96,65 @@ class Invitation
 
     }
 
-    public function verifyMembership(String $email)
+    public function verifyMembership(String $email ='info@amirshahilaw.com') : Array
     {
+        $session_id = $this->login();
+        $result = $this->findMember($email);
+        //  dump(get_object_vars($result)); return $result;
+        if ('SUCCESS' != $result->listAccountsResponse->operationResult) {
+            throw new \Exception('member query operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
+        }
+        // if no member record is found...
+        if ($result->listAccountsResponse->page->totalResults === 0) {
+            dump("not found");
+            return null;
+        }
+        // else, check expiration. order of columns is not guaranteed, so...
+        $objects = $result->listAccountsResponse->searchResults->nameValuePairs[0]->nameValuePair;
+        
+        $return = [];
+        foreach ($objects as $o) {
+            $return[$o->name] = $o->value ?? null;
 
+            if ($o->name == 'Membership Expiration Date' ) {
+                if (! $o->value) {
+                    //dump("Life member?");
+                    $return['valid']= true;
+                } else {//
+                    $today = date('Y-m-d');
+                    $expiration = $o->value;
+                    if ($expiration > $today) {
+                        $return['valid'] = true;
+                    }
+                }
+            }
+        }
+        
+        return $return;
 
     }
 
 
 }
 /* 
+
+
+
+https://api.neoncrm.com/neonws/services/api/account/listAccounts?
+responseType=json
+userSessionId=$KEY
+outputfields.idnamepair.id=
+outputfields.idnamepair.name=Account%20ID
+outputfields.idnamepair.id=
+outputfields.idnamepair.name=First20Name
+utputfields.idnamepair.id=
+outputfields.idnamepair.name=Last%20Name
+outputfields.idnamepair.id=
+outputfields.idnamepair.name=Email%201
+searches.search.key=Email
+searches.search.searchOperator=CONTAIN
+searches.search.value=bo
+outputfields.idnamepair.name=Membership%20Expiration%20Date"|
 
 # notes to self
 

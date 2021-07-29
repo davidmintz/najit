@@ -15,8 +15,16 @@ class IndexController extends AbstractController {
      {
         //dump($invitation->getConfig());
         //dump($invitation->login());
-        dump($invitation->doShit()->listAccountsResponse->searchResults->nameValuePairs);
-        return new Response(sprintf("<html><body>%s</body></html>","Woo hoo!"));
+      $shit = $invitation
+         ->verifyMembership('info@amirshahilaw.com');
+         //->verifyMembership('david@davidmintz.org');
+         //->listAccountsResponse;// ->searchResults;//->nameValuePairs;
+      // $t = '';
+      // foreach ($shit as $s) {
+      //    $t .= print_r($s,true);
+      // }
+        return new Response(sprintf("<html><body><pre>%s</pre></body></html>","Woo hoo!<br>".print_r($shit,true)));
      }
 
 }
+;
