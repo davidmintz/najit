@@ -8,24 +8,19 @@ use Psr\Log\LoggerInterface;
 class Invitation
 {
     
-    private $config;
+    /** @var  String $session_id */
+    private $session_id;
 
-    /** @var GuzzleHttp\Client */
-    private $client;
-
-    /** @var  Psr\Log\LoggerInterface */
-    private $logger;
 
     /**
      * constructor
      * 
+     * @param Array $config
+     * @param LoggerInterface $logger
      * 
      */
-
-    public function __construct(Array $config, LoggerInterface $logger)
+    public function __construct(private Array $config, private LoggerInterface $logger)
     {
-        $this->config = $config;
-        $this->logger = $logger; 
         $this->init();
     }
 
@@ -34,19 +29,25 @@ class Invitation
         return $this->config;
     }
 
-    private function init()
+    /**
+     * instantiates http client
+     */
+    private function init() : void
     {
         $this->client = new Client();
-
     }
+
 
     /**
      * Gets NeonCRM session id
      *
      * @return String
      */
-    public function login() : String
+    public function getSessionId() : String
     {
+        if ($this->session_id) {
+            return $this->session_id;
+        }
         $endpoint = $this->config['neoncrm.base_uri'] . '/common/login';
         $res = $this->client->request('GET',$endpoint,[
            'query'=>[
@@ -61,23 +62,25 @@ class Invitation
             throw new \Exception('login operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
         }
 
-       
-        return $result->userSessionId;
+        $this->session_id = $result->userSessionId;
+        return $this->session_id;
   
     }
     /**
      * queries a NAJIT member record
      * 
+     * @param String $email
+     * @return \stdClass
      * 
      */
     public function findMember(String $email) :? \stdClass
     {
-        $session_id = $this->login();
-        $this->logger->debug('logged in with session id: '.$session_id);
-        dump('logged in with session id: '.$session_id);
-        // if (! $email ) { $email = 'yarmila13@comcast.net'; }
-        dump ('using email: '.$email);
+        $session_id = $this->getSessionId();
+        $this->logger->debug('logged in with session id: '.$session_id);        
         $endpoint = $this->config['neoncrm.base_uri'] . '/account/listAccounts';
+        /* This ugliness apparently can't be avoided because field names are reused 
+        multiple times. If we were to create an array, the keys set later would overwrite 
+        the ones set earlier */
         $query_parts = [
             "userSessionId=$session_id",
             'responseType=json',         
@@ -109,17 +112,16 @@ class Invitation
      * @param String $email
      * @return Array
      */
-    public function verifyMembership(String $email = 'info@amirshahilaw.com') :? Array
+    public function verifyMembership(String $email) :? Array
     {
-        $session_id = $this->login();
+
         $result = $this->findMember($email);
-        //  dump(get_object_vars($result)); return $result;
         if ('SUCCESS' != $result->listAccountsResponse->operationResult) {
             throw new \Exception('member query operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
         }
         // if no member record is found...
         if ($result->listAccountsResponse->page->totalResults === 0) {
-            dump("not found");
+            // dump("not found");
             return null;
         }
         // else, check expiration. order of columns is not guaranteed, so...
@@ -131,7 +133,6 @@ class Invitation
 
             if ($o->name == 'Membership Expiration Date' ) {
                 if (! $o->value) {
-                    //dump("Life member?");
                     $return['valid']= true;
                 } else {
                     $today = date('Y-m-d');
@@ -146,14 +147,21 @@ class Invitation
         return $return;
     }
 
+    /**
+     * Sends invitation to create user account.
+     * 
+     * Uses the Discourse API to create and email an invitation 
+     * to create a user account.
+     * 
+     * @param string $email
+     */
     public function sendInvitation(String $email) : \stdClass
     {
         $endpoint = $this->config['discourse.base_uri'] . '/invites';
         $headers = [
             'Api-Key' => $this->config['discourse.api_key'],
             'Api-Username' => $this->config['discourse.api_username'],
-            'Accept'     => 'application/json', // maybe
-
+            'Accept'     => 'application/json', // maybe not required
         ];
         try {
             // first we have to create the invitation, apparently...
@@ -164,7 +172,7 @@ class Invitation
     
             $id = $data->id;
             $endpoint .= "/$data->id";
-            dump("gonna PUT $endpoint");
+            
             // ...then update it to make it get emailed to someone specific
             $res = $this->client->request('PUT',$endpoint,[
                 'headers' => $headers,
