@@ -1,3 +1,4 @@
+// assets/app.js
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -8,5 +9,14 @@
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 
-// start the Stimulus application
-import './bootstrap';
+// Need jQuery? Install it with "yarn add jquery", then uncomment to import it.
+import $ from 'jquery';
+
+console.log('Hello Webpack Encore! Edit me in assets/app.js');
+
+$(function() {
+    $("button[type=submit").on("click",function(e){
+        e.preventDefault();
+        console.warn("Yo!");
+    });
+});
