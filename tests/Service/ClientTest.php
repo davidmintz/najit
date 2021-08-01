@@ -28,7 +28,7 @@ final class ClientTest extends KernelTestCase
         //$this->client = $container->get(Invitation::class);
     }
 
-    public function testClientObject()
+    public function testInvitationClientObjectCanBeInstantiated()
     {
         $this->assertTrue(is_object(self::$client));
         
@@ -53,7 +53,7 @@ final class ClientTest extends KernelTestCase
        $this->assertEquals('SUCCESS',$result->listAccountsResponse->operationResult);
        $this->assertIsArray($result->listAccountsResponse->searchResults->nameValuePairs);
        $data = $result->listAccountsResponse->searchResults->nameValuePairs;
-       dump($data);
+       //dump($data);
     }
 
     
@@ -68,7 +68,7 @@ final class ClientTest extends KernelTestCase
        $this->assertIsObject($result->listAccountsResponse);
        $this->assertEquals('SUCCESS',$result->listAccountsResponse->operationResult);
        $this->assertIsArray($result->listAccountsResponse->searchResults->nameValuePairs);
-       $data = $result->listAccountsResponse->searchResults->nameValuePairs;
+       //$data = $result->listAccountsResponse->searchResults->nameValuePairs;
        
     }
     
