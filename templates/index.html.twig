@@ -2,16 +2,29 @@
 
 {% block body %}
            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <p>Please use this form to request an invitation to join NAJIT's Discourse discussion site. We will use your email address 
-                    to verify that your NAJIT membership is active and then email you a link that will bring you to the Discourse user registration page.</p>
+                <div class="col-md-7 offset-md-3">
+                    <p class="intro">Please use the form below to request an invitation to join NAJIT's <a href="https://www.discourse.org/" target="_blank">Discourse</a> discussion site. We will use your email address 
+                    to verify that your NAJIT membership is active, and then email you a link pointing you to the Discourse user registration page.</p>
+                    <h3 class="mt-3">Please note...</h3>
+                    <p class="intro">
+                    This is a pilot project. NAJIT is testing Discourse to determine whether to adopt it as our online discussion platform. When you participate 
+                    in this project, besides adhering to the customary and conventional terms and conditions (don't do anything illegal or abusive) you 
+                    should also be aware of the following points:
+                    <ul class="intro">
+                        <li>This Discourse site for current NAJIT members only.</li>
+                        <li>If and when NAJIT launches its official Discourse site, we do not yet know whether the user accounts and data will be migrated from the 
+                    pilot. Whatever you post during the pilot phase might not be preserved, and you might have to create your user account again.</li>
+                        <li>The email address you use to register for Discourse must be the same one in your NAJIT membership record. That's because 
+                        we use it to identify you as a NAJIT member.</li>
+                    </ul>
+                    </p>
                     <form>
                     <div class="mb-3">
                         <label for="email"  class="form-label">Email address</label>
                         <input type="email" placeholder="your_name@example.org"  class="form-control form-control-lg" id="email" aria-describedby="emailHelp">
                         <div id="emailHelp" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    <button type="submit" class="btn btn-primary btn-lg">Send invitation</button>
                     </form>
                 </div>
             </div>
