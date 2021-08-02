@@ -10,7 +10,7 @@ use PhpParser\Node\Expr\Cast\Array_;
 final class ClientTest extends KernelTestCase
 {
     
-    private  static $client;
+    private static $client;
 
     public static function setUpBeforeClass() : void
     {
@@ -20,12 +20,7 @@ final class ClientTest extends KernelTestCase
 
     public function setUp() : void
     {
-        // fwrite(STDOUT, __METHOD__ . "\n");
         self::bootKernel();
-
-        // (2) use static::getContainer() to access the service container
-        //$container = static::getContainer();
-        //$this->client = $container->get(Invitation::class);
     }
 
     public function testInvitationClientObjectCanBeInstantiated()
