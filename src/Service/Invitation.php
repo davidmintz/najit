@@ -132,7 +132,7 @@ class Invitation
             $return[$o->name] = $o->value ?? null;
 
             if ($o->name == 'Membership Expiration Date' ) {
-                if (! $o->value) {
+                if (! isset($o->value)) {
                     $return['valid']= true;
                 } else {
                     $today = date('Y-m-d');
@@ -190,7 +190,29 @@ class Invitation
             // log it or what have you...
             throw $e;
         }   
-    }   
+    }
+
+    /**
+     * deletes an invitation
+     * 
+     * @param int $id
+     * @return stdClass object
+     */
+    public function deleteInvitation(int $id) : \stdClass
+    {
+        $endpoint = $this->config['discourse.base_uri'] . '/invites';
+        $headers = [
+            'Api-Key' => $this->config['discourse.api_key'],
+            'Api-Username' => $this->config['discourse.api_username'],
+            'Accept'     => 'application/json', // maybe not required
+        ];
+        $response = $this->client->request('DELETE',$endpoint,[
+            'headers' => $headers,
+            'form_params' => ['id' => $id]
+        ]);
+
+        return json_decode((string)$response->getBody());
+    }
 
 }
 /* 
