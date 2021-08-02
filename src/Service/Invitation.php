@@ -139,6 +139,8 @@ class Invitation
                     $expiration = $o->value;
                     if ($expiration > $today) {
                         $return['valid'] = true;
+                    } else {
+                        $return['valid'] = false;
                     }
                 }
             }
