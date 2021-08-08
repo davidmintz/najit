@@ -1,9 +1,12 @@
+<?php
 /** simple class representing a prospective user of NAJIT's Discourse site */
+
 declare(strict_types=1);
 
-namespace App\Entity
+namespace App\Entity;
 
-class User {
+class User
+{
 
     /**
      * @Assert\Email(
