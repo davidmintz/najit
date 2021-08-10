@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+
+
            <div class="row">
                 <div class="col-md-7 offset-md-3">
                     <p class="intro">Please use the form below to request an invitation to join NAJIT's <a href="https://www.discourse.org/" target="_blank">Discourse</a> discussion site. We will use your email address 
@@ -18,17 +20,17 @@
                         we use it to identify you as a NAJIT member.</li>
                     </ul>
                     </p>
-                    <form action="">
+                    <form action="/invite" method="POST">
                     <div class="mb-3">
                         <label for="email"  class="form-label">Email address</label>
                         {{ form_widget(form.email,  {'attr': { 
-                             'id': 'email', 
+                             'id': 'email', name : 'email',
                              'class': 'form-control form-control-lg',
                              'placeholder' : 'your_name@example.com',
                              'aria-describedby' : 'email_help'
                              }})}}
                         <div id="email_help" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
-                        {{  form_widget(form._token) }}
+                        {{  form_widget(form._token, { attr : { name : '_token'}}) }}
                     </div>
                     <button type="submit" class="btn btn-primary btn-lg">Send invitation</button>
                     </form>
