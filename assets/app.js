@@ -17,6 +17,7 @@ console.log('Hello Webpack Encore! Edit me in assets/app.js');
 $(function() {
     $("button[type=submit").on("click",function(e){
         e.preventDefault();
-        console.warn("Yo!");
+        console.warn("shit was clicked");
+        $.post("/invite").then(r=>console.log("xhr shit worked"));
     });
 });

@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Form\NAJITMemberFormType;
+
 class IndexController extends AbstractController {
 
     public function __construct(
@@ -14,6 +16,7 @@ class IndexController extends AbstractController {
         private bool $verified = false)
     {
         // such convenience!
+        // may need to be downgraded for PHP < 8
     }
 
     /**
@@ -21,18 +24,20 @@ class IndexController extends AbstractController {
      */
      public function index(Invitation $service) : Response
      {
-      
-         return $this->render('index.html.twig'); 
+        $form = $this->createForm(NAJITMemberFormType::class);
+        return $this->render('index.html.twig',['form' =>$form->createView()]); 
      }
 
      /**
-      * @Route("/verify/{email}", name="verify")
+      * @Route("/invite", name="invite", methods={"POST"})
       */
-     public function verifyMembership($email)
+     public function invite()
      {
         $shit = get_class($this->service) ;
-        return $this->json(['email' => $email,'shit'=>$shit]);
+        return $this->json(['email' => 'gack','shit'=>$shit]);
      }
+
+     
 
 
 
