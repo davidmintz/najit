@@ -129,7 +129,7 @@ class Invitation
         
         $return = [];
         foreach ($objects as $o) {
-            
+
             $return[$o->name] = $o->value ?? null;
             if ($o->name == 'Membership Expiration Date' ) {
                 if (! isset($o->value)) {
@@ -145,7 +145,7 @@ class Invitation
                 }
             }
         }
-
+        $this->logger->debug("returning from ".__METHOD__);
         return $return;
     }
 
