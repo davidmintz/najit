@@ -47,29 +47,40 @@ class IndexController extends AbstractController {
       */
      public function invite(Request $request, Invitation $service)
      {
-        
-        
         $user = new NAJITMember();
         $form = $this->createForm(NAJITMemberFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
 
-            if ($form->isValid()) {
-                $valid = 'valid!';
-                $errors = [];
-            } else {
-                $valid = 'NOT valid';
-                                $messages = [];
+            if (! $form->isValid()) {
+                $valid = false;
+                $messages = [];
                 $errors = $form->getErrors(true);
                 foreach($errors as $k => $v) {
-                    $messages[$k] = $v->getMessage();  //get_class($v);
+                    // this is absurd. there must be a better way
+                    // to return an array of validation error messages
+                    // where the key = element name and value = message
+                    $message = $v->getMessage();
+                    if (stristr($message, 'email')) {
+                        $messages['email'] = $message;
+                    } elseif ( true or stristr($message, 'CSRF')) {
+                        $messages['csrf'] = $message;
+                    } else {
+                        throw new \Exception('can\'t figure out form element for message: "$message"');
+                    }
+                    return $this->json(['valid'=> $valid, 'messages'=>$messages]);
                 }
+            } else { // valid form. give it a shot.
+                $valid = true;
+                $errors = [];
+                $response = ['valid' => true,'debug' => 'next step, check membership'];
+                $data = $service->verifyMembership($user->getEmail());
+                $response['member'] = $data;
+                return $this->json($response);
             }
-            return $this->json(['valid'=> $valid, 'errors'=>(string)$form->getErrors(true), 'messages'=>$messages]);
         } else {
             return $this->json(['result' => 'not submitted??']) ;
         }
-        
-     }
+    }
 }

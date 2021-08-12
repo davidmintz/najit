@@ -13,14 +13,24 @@ import './styles/app.css';
 import $ from 'jquery';
 
 console.log('Hello Webpack Encore! Edit me in assets/app.js');
+var btn = $("button[type=submit");
+var btn_text = btn.children("span").text();
 
 $(function() {
-    $("button[type=submit").on("click",function(e){ // return;
+    btn.on("click",function(e){ // return;
         e.preventDefault();
+        var label = btn.children("span");
+        btn.children("span").text("").addClass("fas fa-spinner fa-spin").attr("disabled",true);
         console.warn("shit was clicked");
         // console.warn( $("#najit_member_form_email").val())
         $.post("/invite",$("form").serialize())
-        .then(r=>console.log(r))
+        .then(r=>{ 
+            console.log(r);
+            // check if there are validation errors;
+            label.removeClass("fas fa-spinner fa-spin").text(btn_text);
+            // and maybe restore button if there are validation errors
+
+        });
         // $.post("/invite",{
         //     email : $("#najit_member_form_email").val(),
         //     _token : $("najit_member_form_token").val()
