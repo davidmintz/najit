@@ -43,9 +43,9 @@ class IndexController extends AbstractController {
      }
 
      /**
-      * @Route("/invite", name="invite", methods={"POST"})
+      * @Route("/verify", name="verify", methods={"POST"})
       */
-     public function invite(Request $request, Invitation $service)
+     public function verify(Request $request, Invitation $service)
      {
         $user = new NAJITMember();
         $form = $this->createForm(NAJITMemberFormType::class, $user);
@@ -60,7 +60,7 @@ class IndexController extends AbstractController {
                 foreach($errors as $k => $v) {
                     // this is absurd. there must be a better way
                     // to return an array of validation error messages
-                    // where the key = element name and value = message
+                    // in the form element_name => error_messasge
                     $message = $v->getMessage();
                     if (stristr($message, 'email')) {
                         $messages['email'] = $message;

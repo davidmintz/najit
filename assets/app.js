@@ -12,7 +12,6 @@ import './styles/app.css';
 // Need jQuery? Install it with "yarn add jquery", then uncomment to import it.
 import $ from 'jquery';
 
-console.log('Hello Webpack Encore! Edit me in assets/app.js');
 var btn = $("button[type=submit");
 var btn_text = btn.children("span").text();
 
@@ -23,7 +22,7 @@ $(function() {
         btn.children("span").text("").addClass("fas fa-spinner fa-spin").attr("disabled",true);
         console.warn("shit was clicked");
         // console.warn( $("#najit_member_form_email").val())
-        $.post("/invite",$("form").serialize())
+        $.post("/verify",$("form").serialize())
         .then(r=>{ 
             console.log(r);
             // check if there are validation errors;

@@ -127,26 +127,36 @@ class Invitation
         // else, check expiration. order of columns is not guaranteed, so...
         $objects = $result->listAccountsResponse->searchResults->nameValuePairs[0]->nameValuePair;
         
-        $return = [];
+        $data = [ 'valid' => false,];
+        $member = [];
+        $props = [
+            'Email 1' => 'email',
+            'Last Name' => 'last_name',
+            'First Name' => 'first_name',
+            'Membership Expiration Date' => 'expiration_date',
+            'Account ID' => 'account_id',
+        ];
         foreach ($objects as $o) {
 
-            $return[$o->name] = $o->value ?? null;
+            $member[$props[$o->name]] = $o->value ?? null;
             if ($o->name == 'Membership Expiration Date' ) {
                 if (! isset($o->value)) {
-                    $return['valid']= true;
+                    $data['valid']= true;
                 } else {
                     $today = date('Y-m-d');
                     $expiration = $o->value;
                     if ($expiration > $today) {
-                        $return['valid'] = true;
+                        $data['valid'] = true;
                     } else {
-                        $return['valid'] = false;
+                        $data['valid'] = false;
                     }
                 }
             }
         }
+        $data['member'] = $member;
         $this->logger->debug("returning from ".__METHOD__);
-        return $return;
+
+        return $data;
     }
 
     /**
