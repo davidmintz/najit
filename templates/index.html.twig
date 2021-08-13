@@ -23,14 +23,15 @@
                     <form action="/invite" method="POST">
                     <div class="mb-3">
                         <label for="email"  class="form-label">Email address</label>
-                        {{ form_widget(form.email,  {'attr': { 
-                             'id': 'email', name : 'email',
+                        {{ form_widget(form.email,  {
+                            'id':"email",
+                            'attr': { 
                              'class': 'form-control form-control-lg',
                              'placeholder' : 'your_name@example.com',
                              'aria-describedby' : 'email_help'
                              }})}}
                         <div id="email_help" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
-                        {{  form_widget(form._token, { attr : { name : '_token'}}) }}
+                        {{  form_widget(form._token, { id: "csrf", attr : { name : '_token'}}) }}
                     </div>
                     <button id="btn-submit" type="submit" class="btn btn-primary btn-lg"><span>Send invitation</span></button>
                     </form>
