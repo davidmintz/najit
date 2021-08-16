@@ -1,44 +1,48 @@
-{% extends 'base.html.twig' %}
+    {% extends 'base.html.twig' %}
 
-{% block body %}
-
-
-           <div class="row">
-                <div class="col-md-7 offset-md-3">
-                    <p class="intro">Please use the form below to request an invitation to join NAJIT's <a href="https://www.discourse.org/" target="_blank">Discourse</a> discussion site. We will use your email address 
-                    to verify that your NAJIT membership is active, and then email you a link pointing you to NAJIT's Discourse user registration page.</p>
-                    <h2 class="mt-3">Please note...</h2>
-                    <p class="intro">
-                    This is a pilot project. NAJIT is testing Discourse to determine whether to adopt it as our online discussion platform. When you participate 
-                    in this project, besides adhering to the customary and conventional terms and conditions (don't do anything illegal or abusive),you 
-                    should also be aware of the following points:
-                    <ul class="intro">
-                        <li>This Discourse site for current NAJIT members only.</li>
-                        <li>If and when NAJIT launches its official Discourse site, we do not yet know whether the user accounts and data will be migrated from the 
-                    pilot. Whatever you post during the pilot phase might not be preserved, and you might have to create your user account again.</li>
-                        <li>The email address you use to register for Discourse must be the same as in your NAJIT membership record. That's because 
-                        we use it to identify you as a NAJIT member.</li>
-                    </ul>
-                    </p>
-                    <form id="form" action="/invite" method="POST">
-                    <div class="mb-3">
-                        <label for="email"  class="form-label">Email address</label>
-                        {{ form_widget(form.email,  {
-                            'id':"email",
-                            'attr': { 
-                             'class': 'form-control form-control-lg',
-                             'placeholder' : 'your_name@example.com',
-                             'aria-describedby' : 'email_help'
-                             }})}}
-                        <div id="error-email" class="form-error text-danger"></div>
-                        <div id="email_help" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
-                        {{  form_widget(form._token, { id: "csrf", attr : { name : '_token'}}) }}
-                    </div>
-                    <div id="error-csrf" class="form-error text-danger"></div>
-                    <button id="btn-submit" type="submit" class="btn btn-primary btn-lg"><span>Send invitation</span></button>
-                    </form>
-                    <hr>
-                    
+    {% block body %}
+    <form id="form" action="/invite" method="POST">
+        <div class="row">
+            <div class="col-md-7 offset-md-3">
+                <p class="intro">Please use the form below to request an invitation to join NAJIT's <a href="https://www.discourse.org/" target="_blank">Discourse</a> discussion site. We will use your email address
+                to verify that your NAJIT membership is active, and then email you a link pointing you to NAJIT's Discourse user registration page.</p>
+                <h2 class="mt-3">Please note...</h2>
+                <p class="intro">
+                This is a pilot project. NAJIT is testing Discourse to determine whether to adopt it as our online discussion platform. When you participate
+                in this project, besides adhering to the customary and conventional terms and conditions (don't do anything illegal or abusive),you
+                should also be aware of the following points:
+                <ul class="intro">
+                    <li>This Discourse site for current NAJIT members only.</li>
+                    <li>If and when NAJIT launches its official Discourse site, we do not yet know whether the user accounts and data will be migrated from the
+                pilot. Whatever you post during the pilot phase might not be preserved, and you might have to create your user account again.</li>
+                    <li>The email address you use to register for Discourse must be the same as in your NAJIT membership record. That's because
+                    we use it to identify you as a NAJIT member.</li>
+                </ul>
+                </p>
+                <div class="mb-3">
+                <label for="email"  class="form-label">Email address</label>
+                {{ form_widget(form.email,  {
+                    'id':"email",
+                    'attr': {
+                        'class': 'form-control form-control-lg',
+                        'placeholder' : 'your_name@example.com',
+                        'aria-describedby' : 'email_help'
+                        }})}}
+                <div id="error-email" class="form-error text-danger"></div>
+                <div id="email_help" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
+                {{  form_widget(form._token, { id: "csrf", attr : { name : '_token'}}) }}
                 </div>
+                <div id="error-csrf" class="form-error text-danger"></div>
+            </div> {# /col #}
+        </div>{# /row #}
+        <div class="row">
+            <div class="col-md-2 offset-md-3">
+                <button id="btn-submit" type="submit" class="btn btn-primary btn-lg">
+                    <span>Send invitation</span>
+                    <span id="spinner" class="fas fa-spinner fa-spin" hidden></span>
+                </button>
             </div>
-{% endblock %}
+            <div class="col-md-5"><div class="p-2" id="status"></div></div>
+        </div>
+    </form>
+    {% endblock %}

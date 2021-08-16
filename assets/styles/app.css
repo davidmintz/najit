@@ -1,7 +1,5 @@
-body {
-    /* background-color: lightgray; */
-}
 
-.intro {
-    font-size: 115%;
+
+.intro, .form-error, #status {
+    font-size: 120%;
 }

@@ -127,7 +127,7 @@ class Invitation
         // else, check expiration. order of columns is not guaranteed, so...
         $objects = $result->listAccountsResponse->searchResults->nameValuePairs[0]->nameValuePair;
         
-        $data = [ 'valid' => false,];
+        $data = [ 'expired' => true,]; // presume expired
         $member = [];
         $props = [
             'Email 1' => 'email',
@@ -140,21 +140,20 @@ class Invitation
 
             $member[$props[$o->name]] = $o->value ?? null;
             if ($o->name == 'Membership Expiration Date' ) {
-                if (! isset($o->value)) {
-                    $data['valid']= true;
+                if (! isset($o->value)) { // life membership
+                    $data['expired']= false;
                 } else {
                     $today = date('Y-m-d');
                     $expiration = $o->value;
-                    if ($expiration > $today) {
-                        $data['valid'] = true;
-                    } else {
-                        $data['valid'] = false;
+                    if ($expiration >= $today) {
+                        $data['expired'] = false;
                     }
                 }
             }
         }
         $data['member'] = $member;
-        $this->logger->debug("returning from ".__METHOD__);
+        $this->logger->debug("returning from ".__METHOD__ );
+        $this->logger->debug("...with expired = $expiration and today = $today ; expired? ".($data['expired'] ? "true":"false"));
 
         return $data;
     }
@@ -262,7 +261,17 @@ curl "https://api.neoncrm.com/neonws/services/api/common/login?login.apiKey=3a62
   }
   
 [ query member record using email ]
-curl "https://api.neoncrm.com/neonws/services/api/account/listAccounts?responseType=json&userSessionId=$KEY&outputfields.idnamepair.id=&outputfields.idnamepair.name=Account%20ID&outputfields.idnamepair.id=&outputfields.idnamepair.name=First%20Name&outputfields.idnamepair.id=&outputfields.idnamepair.name=Last%20Name&outputfields.idnamepair.id=&outputfields.idnamepair.name=Email%201&searches.search.key=Email&searches.search.searchOperator=EQUAL&searches.search.value=natasha.bonilla@gmail.com&outputfields.idnamepair.name=Membership%20Expiration%20Date"|
+curl "https://api.neoncrm.com/neonws/services/api/account/listAccounts?responseType=json&userSessionId=$KEY
+
+&outputfields.idnamepair.id=&outputfields.idnamepair.name=Account%20ID&outputfields.idnamepair.id=
+
+&outputfields.idnamepair.name=First%20Name&outputfields.idnamepair.id=&outputfields.idnamepair.name=Last%20Name
+
+&outputfields.idnamepair.id=&outputfields.idnamepair.name=Email%201&searches.search.key=Email
+
+&searches.search.searchOperator=EQUAL&searches.search.value=natasha.bonilla@gmail.com
+
+&outputfields.idnamepair.name=Membership%20Expiration%20Date"|
 
 
 

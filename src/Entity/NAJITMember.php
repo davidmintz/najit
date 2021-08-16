@@ -17,7 +17,7 @@ class NAJITMember
      *     message = "'{{ value }}' is not a valid email address"
      * )
      * @Assert\NotBlank(
-     *     message = "Email is required"
+     *     message = "email address is required"
      * )
      */    
     private $email;

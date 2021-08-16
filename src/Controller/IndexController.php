@@ -68,6 +68,7 @@ class IndexController extends AbstractController {
                 $response = ['valid' => true,];
                 $data = $service->verifyMembership($user->getEmail());
                 $response['member'] = $data['member'] ?? null;
+                $response['expired'] = $data['member'] ? $data['expired'] : null;
                 return $this->json($response);
             }
         } 
@@ -76,10 +77,12 @@ class IndexController extends AbstractController {
         // }
     }
 
-
+    /**
+     * @Route("invite",name="/invite",methods={"POST"})
+     */
     public function sendInvitation(Request $request)
     {
         $c = $request->getContent();
-        //? .....
+        return $this->json(['debug'=>'$c is a '. gettype($c)]);
     }
 }
