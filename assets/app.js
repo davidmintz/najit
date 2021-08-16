@@ -37,9 +37,16 @@ $(function() {
                 label.removeClass("fas fa-spinner fa-spin").text(btn_text);
                 return;
             } else {
-
+                return response;
             }
             
+        }).then((response)=>{
+            console.log("I am the 2nd 'then'");
+            if (! response.member) {
+                console.log("no membership found. display message, restore button");
+            } else {
+                console.log(`member found. expiration: ${response.member.expiration_date}`);
+            }
         });
     });
 });

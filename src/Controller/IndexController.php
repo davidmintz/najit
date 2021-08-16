@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\Form\NAJITMemberFormType;
+use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 
 
@@ -23,23 +24,12 @@ class IndexController extends AbstractController {
     }
 
     /**
-     * @Route("/",name="home")
+     * @Route("/",name="home", methods={"GET"})
      */
      public function index(Request $request) : Response
      {
         $form = $this->createForm(NAJITMemberFormType::class);
-        // $form->handleRequest($request);
-        // if ($form->isSubmitted()) {
-        //     if ($form->isValid()) {
-        //         $valid = 'valid!';
-        //     } else {
-        //         $valid = 'NOT valid';
-        //     }
-        //     return $this->json(['valid' => $valid]);
-        // } else {
-
             return $this->render('index.html.twig',['form' =>$form->createView()]); 
-        // }
      }
 
      /**
@@ -51,7 +41,7 @@ class IndexController extends AbstractController {
         $form = $this->createForm(NAJITMemberFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted()) { // which it should be
 
             if (! $form->isValid()) {
                 $valid = false;
@@ -80,8 +70,16 @@ class IndexController extends AbstractController {
                 $response['member'] = $data['member'] ?? null;
                 return $this->json($response);
             }
-        } else {
-            return $this->json(['result' => 'not submitted??']) ;
-        }
+        } 
+        // else {
+        //     return $this->json(['result' => 'not submitted??']) ;
+        // }
+    }
+
+
+    public function sendInvitation(Request $request)
+    {
+        $c = $request->getContent();
+        //? .....
     }
 }
