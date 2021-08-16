@@ -25,18 +25,21 @@ $(function() {
         // console.warn( $("#najit_member_form_email").val())
         $.post("/verify",$("form").serialize())
         .then(response=>{ 
-            console.log(`valid? ${response.valid}`);
-            if (! response.valid) {
-                console.log("show validation errors!");
-                console.warn(typeof response.messages);
-                
-                // $(".form-error")
-            }
+            console.debug(`valid? ${response.valid}`);
             // check if there are validation errors;
-            label.removeClass("fas fa-spinner fa-spin").text(btn_text);
-            // $("#status").remove();
-            // and maybe restore button if there are validation errors
+            if (! response.valid) {
+                var keys = Object.keys(response.messages);
+                keys.forEach((key,i)=>{
+                    $(`#error-${key}`).text(response.messages[key]);
+                });
+                // and restore button if there are validation errors
+                btn.removeAttr("disabled");
+                label.removeClass("fas fa-spinner fa-spin").text(btn_text);
+                return;
+            } else {
 
+            }
+            
         });
     });
 });

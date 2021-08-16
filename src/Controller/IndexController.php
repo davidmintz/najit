@@ -63,20 +63,21 @@ class IndexController extends AbstractController {
                     // in the form element_name => error_messasge
                     $message = $v->getMessage();
                     if (stristr($message, 'email')) {
-                        $messages['email'] = $message;
-                    } elseif ( true or stristr($message, 'CSRF')) {
+                        $messages['email'] = $message; 
+                    } elseif ( stristr($message, 'CSRF')) {
                         $messages['csrf'] = $message;
                     } else {
                         throw new \Exception('can\'t figure out form element for message: "$message"');
                     }
+                    // print_r($messages);
                     return $this->json(['valid'=> $valid, 'messages'=>$messages]);
                 }
             } else { // valid form. give it a shot.
                 $valid = true;
                 $errors = [];
-                $response = ['valid' => true,'debug' => 'next step, check membership'];
+                $response = ['valid' => true,];
                 $data = $service->verifyMembership($user->getEmail());
-                $response['member'] = $data;
+                $response['member'] = $data['member'] ?? null;
                 return $this->json($response);
             }
         } else {
