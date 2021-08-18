@@ -15,12 +15,11 @@
                     <li>This Discourse site for current NAJIT members only.</li>
                     <li>If and when NAJIT launches its official Discourse site, we do not yet know whether the user accounts and data will be migrated from the
                 pilot. Whatever you post during the pilot phase might not be preserved, and you might have to create your user account again.</li>
-                    <li>The email address you use to register for Discourse must be the same as in your NAJIT membership record. That's because
+                    <li>The email address you use to register for Discourse  <em>must be the same as in your NAJIT membership record</em>. That's because
                     we use it to identify you as a NAJIT member.</li>
                 </ul>
                 </p>
-                <div class="mb-3">
-                <label for="email"  class="form-label">Email address</label>
+                {# <label for="email"  class="form-label">Email address</label>
                 {{ form_widget(form.email,  {
                     'id':"email",
                     'attr': {
@@ -29,13 +28,38 @@
                         'aria-describedby' : 'email_help'
                         }})}}
                 <div id="error-email" class="form-error text-danger"></div>
-                <div id="email_help" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div>
+                <div id="email_help" class="form-text">Note that this email address must be the same as in your NAJIT membership record.</div>
                 {{  form_widget(form._token, { id: "csrf", attr : { name : '_token'}}) }}
-                </div>
-                <div id="error-csrf" class="form-error text-danger"></div>
+                <div id="error-csrf" class="form-error text-danger"></div> #}
             </div> {# /col #}
+
         </div>{# /row #}
         <div class="row">
+            <div class="offset-md-3 col-md-5 border px-0">
+                {# <label for="email"  class="form-label">Email address</label> #}
+                {# 'aria-describedby' : 'email_help' #}
+                {{ form_widget(form.email,  {
+                    'id':"email",
+                    'attr': {
+                        'class': 'form-control form-control-lg',
+                        'placeholder' : 'your_name@example.com',
+                        }})}}
+                <div id="error-email" class="form-error text-danger"></div>
+                {# <div id="email_help" class="form-text">Note that this email address has to be same as in your NAJIT membership record.</div> #}
+                {{  form_widget(form._token, { id: "csrf", attr : { name : '_token'}}) }}
+                <div id="error-csrf" class="form-error text-danger"></div>
+            </div>
+            <div class="col-md-2 ml-0 px-0">
+                <button id="btn-submit" type="submit" class="btn btn-primary btn-lg">
+                    <span>Submit</span>
+                    <span id="spinner" class="fas fa-spinner fa-spin" hidden></span>
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div id="status" class="col-md-7 offset-md-3"></div>
+        </div>
+        {# <div class="row">
             <div class="col-md-2 offset-md-3">
                 <button id="btn-submit" type="submit" class="btn btn-primary btn-lg">
                     <span>Send invitation</span>
@@ -43,6 +67,6 @@
                 </button>
             </div>
             <div class="col-md-5"><div class="p-2" id="status"></div></div>
-        </div>
+        </div> #}
     </form>
     {% endblock %}
