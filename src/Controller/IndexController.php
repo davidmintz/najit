@@ -68,7 +68,7 @@ class IndexController extends AbstractController {
                 $response = ['valid' => true,];
                 $data = $service->verifyMembership($user->getEmail());
                 $response['member'] = $data['member'] ?? null;
-                $response['expired'] = $data['member'] ? $data['expired'] : null;
+                $response['expired'] = !empty($data['member']) ? $data['expired'] : null;
                 return $this->json($response);
             }
         } 
