@@ -10,8 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use App\Form\NAJITMemberFormType;
 use stdClass;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class IndexController extends AbstractController {
 
@@ -29,13 +30,13 @@ class IndexController extends AbstractController {
      public function index(Request $request) : Response
      {
         $form = $this->createForm(NAJITMemberFormType::class);
-            return $this->render('index.html.twig',['form' =>$form->createView()]); 
+        return $this->render('index.html.twig',['form' =>$form->createView()]); 
      }
 
      /**
       * @Route("/verify", name="verify", methods={"POST"})
       */
-     public function verify(Request $request, Invitation $service)
+     public function verify(Request $request)
      {
         $user = new NAJITMember();
         $form = $this->createForm(NAJITMemberFormType::class, $user);
@@ -59,16 +60,16 @@ class IndexController extends AbstractController {
                     } else {
                         throw new \Exception('can\'t figure out form element for message: "$message"');
                     }
-                    // print_r($messages);
                     return $this->json(['valid'=> $valid, 'messages'=>$messages]);
                 }
             } else { // valid form. give it a shot.
-                $valid = true;
                 $errors = [];
                 $response = ['valid' => true,];
-                $data = $service->verifyMembership($user->getEmail());
+                $data = $this->service->verifyMembership($user->getEmail());
                 $response['member'] = $data['member'] ?? null;
                 $response['expired'] = !empty($data['member']) ? $data['expired'] : null;
+                (new Session())->set('member_query',$response);
+
                 return $this->json($response);
             }
         } 
@@ -80,9 +81,23 @@ class IndexController extends AbstractController {
     /**
      * @Route("invite",name="/invite",methods={"POST"})
      */
-    public function sendInvitation(Request $request)
+    public function sendInvitation(Request $request) : JsonResponse
     {
-        $c = $request->getContent();
-        return $this->json(['debug'=>'$c is a '. gettype($c)]);
+        
+        $email = $request->request->get("email");
+        $session = new Session();
+        if (! $session->has('member_query')) {
+            return new JsonResponse(['message'=>'Member query result not found in session.'],500);
+        }
+        $query_result = $session->get('member_query');
+        $member = $query_result['member'];
+        if ($query_result['expired']) {
+            return new JsonResponse(['message'=>'Membership has expired.'],500); 
+        }
+        $session->remove('member_query');
+
+        $result = $this->service->sendInvitation($email);
+
+        return $this->json(['debug'=>"hello $email",'member'=>$member, 'result' => $result]);
     }
 }

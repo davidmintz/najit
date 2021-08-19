@@ -33,7 +33,7 @@ services:
               neoncrm.base_uri: 'https://api.neoncrm.com/neonws/services/api',
               neoncrm.api_id: 'najit'
             }
-        # - 
+          -  "%kernel.environment%"
           
 
 

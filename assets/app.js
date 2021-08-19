@@ -21,16 +21,44 @@ const label = btn.children("span").first();
 const spinner = $("#spinner");
 
 const reset_btn = function(){
-    console.log("hiding spinner?");
     spinner.attr("hidden",true);
     btn.removeAttr("disabled");
 };
+
+const request_invitation = function(email) {
+    $.post("/invite",{email})
+    .then(response=>{
+        if (response.result.error && response.result.message) {
+            status.append(
+                `<br><span class="text-warning fas fa-exclamation-triangle"></span> ${response.result.message}`
+            );
+            return;
+        }
+        // all should be well
+        if (response.result.emailed) {
+            status.append(`<br><span class="text-success fas fa-check"></span> An invitation has been sent. 
+                Please check your inbox in a couple minutes!`);
+        }
+    })
+    .fail(response=>{
+        // console.warn(`error is a : ${typeof error}`);
+        // console.log(response.message);
+        $("#status").append(
+            `<br><span class="text-warning fas fa-exclamation-triangle"></span> An unexpected application error happened. Please try again later`
+        );
+    });
+
+};
+// FOR DEV
+window.$ = $;
+///
 
 $(function() {
     btn.on("click",function(e){
         e.preventDefault();
         spinner.removeAttr("hidden");
-        // takingcare@live.com expired
+        // takingcare@live.com 
+        // dheman_abdi@yahoo.com
 
         status.removeClass("bg-warning").html("searching... ");
         $.post("/verify",$("form").serialize())
@@ -50,27 +78,26 @@ $(function() {
                 return response;
             }
             
-        }).then((response)=>{
+        })
+        .then((response)=>{
             if (! response) { return; }
-            console.log("I am the 2nd 'then'");
             if (! response.member) {
-                console.log("no membership found. display a message, restore button");
                 status.html("NAJIT member not found. Check your email address?").addClass("bg-warning");
                 reset_btn();
             } else {
                 // member found. expired?
-                console.warn(`expired? ${response.expired}`);
-                var expiration_date = dayjs(response.member.expiration_date).format("DD-MMM-YYYY");
+                var expiration_date = response.member.expiration_date === null ? "never"
+                    : dayjs(response.member.expiration_date).format("DD-MMM-YYYY");
                 if (response.expired) {
                     status.html(`NAJIT's records indicate your membership expired on ${expiration_date}. Please renew!`)
                         .addClass("bg-warning");
                     reset_btn();
                     return;
                 } // else, looks good
-                console.log(`member found. expiration: ${response.member.expiration_date || "never"}`);
-                console.log("formatted: "+dayjs(response.member.expiration_date).format("DD-MMM-YYYY"));
-                status.html(`<span class="text-success fas fa-check"></span> Membership found with expiration ${expiration_date}`);
-                console.warn("to be CONTINUED!")
+                // console.log(`member found. expiration: ${response.member.expiration_date || "never"}`);
+                status.html(`<span class="text-success fas fa-check"></span> Membership found with expiration date ${expiration_date}`);
+                console.warn("to be requesting invitation...")
+                request_invitation(response.member.email);
                 reset_btn();
             }
         });

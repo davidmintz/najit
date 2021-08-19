@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace  App\Service;
 use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class Invitation
 {
@@ -19,7 +20,7 @@ class Invitation
      * @param LoggerInterface $logger
      * 
      */
-    public function __construct(private Array $config, private LoggerInterface $logger)
+    public function __construct(private Array $config, private $env, private LoggerInterface $logger)
     {
         $this->init();
     }
@@ -119,10 +120,26 @@ class Invitation
         if ('SUCCESS' != $result->listAccountsResponse->operationResult) {
             throw new \Exception('member query operation failed: '.json_encode($result,JSON_PRETTY_PRINT));
         }
+
         // if no member record is found...
         if ($result->listAccountsResponse->page->totalResults === 0) {
-            // dump("not found");
-            return null;
+            $this->logger->info("member not found",['email' => $email]);
+            
+            if ($email == 'mintz@vernontbludgeon.com') {
+                $this->logger->debug("faking Vernon's membership");
+                return [
+                'member' => [
+                    'email' => 'mintz@vernontbludgeon.com',
+                    'last_name' => 'Bludgeon',
+                    'first_name' => 'Vernon',
+                    'expiration_date' => date('Y-m-d',strtotime('+2 years')),
+                    'account_id' => 54321
+                ],
+                'expired' => false,
+                ];
+            } else {
+                return null;
+            }
         }
         // else, check expiration. order of columns is not guaranteed, so...
         $objects = $result->listAccountsResponse->searchResults->nameValuePairs[0]->nameValuePair;
@@ -152,9 +169,7 @@ class Invitation
             }
         }
         $data['member'] = $member;
-        $this->logger->debug("returning from ".__METHOD__ );
-        $this->logger->debug("...with expired = $expiration and today = $today ; expired? ".($data['expired'] ? "true":"false"));
-
+        $this->logger->info("located member",$data);
         return $data;
     }
 
@@ -168,6 +183,10 @@ class Invitation
      */
     public function sendInvitation(String $email) : \stdClass
     {
+        $this->logger->debug("attempting to send invitation to: $email");
+        if ($this->env == "dev" and !in_array($email, ['david@davidmintz.org','mintz@vernontbludgeon.com'])) {
+            throw new \Exception("you are in dev environment but using an email other than your own: $email");
+        }
         $endpoint = $this->config['discourse.base_uri'] . '/invites';
         $headers = [
             'Api-Key' => $this->config['discourse.api_key'],
@@ -176,31 +195,59 @@ class Invitation
         ];
         try {
             // first we have to create the invitation, apparently...
-            $res = $this->client->request('POST',$endpoint, [
-                'headers' => $headers
-            ]);
+            $res = $this->client->request('POST',$endpoint, ['headers' => $headers ]);
             $data = json_decode((string)$res->getBody());
-    
             $id = $data->id;
             $endpoint .= "/$data->id";
-            
             // ...then update it to make it get emailed to someone specific
             $res = $this->client->request('PUT',$endpoint,[
                 'headers' => $headers,
                 'form_params' => [
                     'email' => $email,  
-                    'custom_message'=>	"This would be your personal message.",
+                    'custom_message'=>	'We received a request to send you this invitation to register for NAJIT\'s Discourse site. '
+                        . "If you did not initiate this yourself or if you're not interested, you can simply ignore this message. ",
                     'send_email'=> true,
+                    'expires_at' => date('Y-m-d+H:iP', strtotime("tomorrow 9:00 am")),
                 ],
             ]);
             $data = json_decode((string)$res->getBody());
-
             return $data;
 
         } catch (\Exception $e) {
-            // log it or what have you...
-            throw $e;
-        }   
+            $this->logger->error("Exception while sending PUT to $endpoint: ".get_class($e), 
+             ['message' => $e->getMessage(), 'trace'=>$e->getTraceAsString()]
+            );
+            $response = [
+                'body' => $data,
+                'error' => $e->getMessage(),
+                'status' => $res->getStatusCode(),
+            ];
+            if (stristr($response['error'],'422 Unprocessable')) {
+                $response['message'] = "It appears that $email already has a user account on NAJIT's Discourse site";
+            } else {
+                $response['message'] = "An unexpected application error happened. Please try again later.";
+            }
+            return (object)$response;
+        }
+        return $data; 
+        // } catch (\Exception $e) {
+        //     if (! empty($res)) {
+        //         $status = $res->getStatusCode();
+        //         if (empty($data)) { 
+        //             $data = new \stdClass;
+        //         }
+        //         $data->status = $res->getStatusCode();
+        //         $data->reason = $res->getReasonPhrase();
+        //         $this->logger->error("shit happened",(Array)$data);
+        //         print $e->getTraceAsString();
+        //         return $data;
+                
+        //     } else {
+        //         throw $e;
+        //     }
+        //     // log it or what have you...
+        //     // throw $e;
+        // }   
     }
 
     /**
