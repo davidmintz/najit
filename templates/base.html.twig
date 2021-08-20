@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-    <head>
+    <head data-base-path="{{ app.request.getBaseURL() }}">
         <meta charset="UTF-8">
         <title>{% block title %}NAJIT's Discourse Pilot Project{% endblock %}</title>
 
@@ -12,7 +12,6 @@
         {# Run `composer require symfony/webpack-encore-bundle`
            and uncomment the following Encore helpers to start using Symfony UX #}
         {% block stylesheets %}
-        
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
 
@@ -27,7 +26,7 @@
                 <h1 class="text-primary my-2 py-2">NAJIT/Discourse Signup</h1>
                 </div>
             </div>
-            {% block body %}some default body here{% endblock %}
+            {% block body %}some default body goes here{% endblock %}
         </div>
     </body>
 </html>
