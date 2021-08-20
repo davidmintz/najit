@@ -53,7 +53,8 @@ const request_invitation = function(email) {
 window.$ = $;
 ///
 
-$(function() {
+$(function() { 
+    const base_path = $("head").data().basePath;
     btn.on("click",function(e){
         e.preventDefault();
         spinner.removeAttr("hidden");
@@ -96,7 +97,6 @@ $(function() {
                 } // else, looks good
                 // console.log(`member found. expiration: ${response.member.expiration_date || "never"}`);
                 status.html(`<span class="text-success fas fa-check"></span> Membership found with expiration date ${expiration_date}`);
-                console.warn("to be requesting invitation...")
                 request_invitation(response.member.email);
                 reset_btn();
             }
