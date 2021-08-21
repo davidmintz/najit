@@ -25,7 +25,7 @@ class IndexController extends AbstractController {
     }
 
     /**
-     * @Route("/",name="home", methods={"GET"})
+     * @Route("/invitations/najit", name="home", methods={"GET"})
      */
      public function index(Request $request) : Response
      {
@@ -34,7 +34,7 @@ class IndexController extends AbstractController {
      }
 
      /**
-      * @Route("/verify", name="verify", methods={"POST"})
+      * @Route("/invitations/najit/verify", name="verify", methods={"POST"})
       */
      public function verify(Request $request)
      {
@@ -79,7 +79,7 @@ class IndexController extends AbstractController {
     }
 
     /**
-     * @Route("invite",name="/invite",methods={"POST"})
+     * @Route("invite",name="/invitations/najit/invite",methods={"POST"})
      */
     public function sendInvitation(Request $request) : JsonResponse
     {

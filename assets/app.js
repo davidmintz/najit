@@ -19,6 +19,8 @@ const btn_text = btn.children("span").text();
 const status = $("#status");
 const label = btn.children("span").first();
 const spinner = $("#spinner");
+const base_path = "/invitations/najit";
+
 
 const reset_btn = function(){
     spinner.attr("hidden",true);
@@ -26,7 +28,7 @@ const reset_btn = function(){
 };
 
 const request_invitation = function(email) {
-    $.post("/invite",{email})
+    $.post(base_path+"/invite",{email})
     .then(response=>{
         if (response.result.error && response.result.message) {
             status.append(
@@ -54,7 +56,7 @@ window.$ = $;
 ///
 
 $(function() { 
-    const base_path = $("head").data().basePath;
+    // const base_path = $("head").data().basePath;
     btn.on("click",function(e){
         e.preventDefault();
         spinner.removeAttr("hidden");
@@ -62,7 +64,7 @@ $(function() {
         // dheman_abdi@yahoo.com
 
         status.removeClass("bg-warning").html("searching... ");
-        $.post("/verify",$("form").serialize())
+        $.post(base_path+"/verify",$("form").serialize())
         .then(response=>{ 
             console.debug(`valid? ${response.valid}`);
             // check if there are validation errors;
