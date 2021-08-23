@@ -79,7 +79,7 @@ class IndexController extends AbstractController {
     }
 
     /**
-     * @Route("invite",name="/invitations/najit/invite",methods={"POST"})
+     * @Route("/invitations/najit/invite",name="invite",methods={"POST"})
      */
     public function sendInvitation(Request $request) : JsonResponse
     {
