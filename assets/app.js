@@ -43,9 +43,7 @@ const request_invitation = function(email) {
         }
     })
     .fail(response=>{
-        // console.warn(`error is a : ${typeof error}`);
-        // console.log(response.message);
-        $("#status").append(
+        $("#status").html(
             `<br><span class="text-warning fas fa-exclamation-triangle"></span> An unexpected application error happened. Please try again later`
         );
     });
@@ -66,7 +64,6 @@ $(function() {
         status.removeClass("bg-warning").html("searching... ");
         $.post(base_path+"/verify",$("form").serialize())
         .then(response=>{ 
-            console.debug(`valid? ${response.valid}`);
             // check if there are validation errors;
             if (! response.valid) {
                 status.empty();

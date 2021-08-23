@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+    <div style="font-size:120%" class="col-sm-12">
+    <p class="lead">Welcome to courtinterpreter.net.</p>
+    <p>This site is intended for future use hosting projects of interest to court interpreters working in 
+    English-speaking legal systems.</p>
+    <p>
+    If you are a <a href="https://najit.org">NAJIT</a> member looking for an invitation to join NAJIT's Discourse discussion site, please 
+    go to <a href="{{ path('najit_index') }}">{{ path('najit_index') }}</a>.
+    </p>
+    </div>
+</div>
+
+{% endblock %}

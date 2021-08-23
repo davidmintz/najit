@@ -25,7 +25,15 @@ class IndexController extends AbstractController {
     }
 
     /**
-     * @Route("/invitations/najit", name="home", methods={"GET"})
+     * @Route("/", name="home")
+     */
+    public function home(): Response
+    {
+        return $this->render('home.html.twig'); 
+    }
+
+    /**
+     * @Route("/invitations/najit", name="najit_index", methods={"GET"})
      */
      public function index(Request $request) : Response
      {
@@ -72,10 +80,7 @@ class IndexController extends AbstractController {
 
                 return $this->json($response);
             }
-        } 
-        // else {
-        //     return $this->json(['result' => 'not submitted??']) ;
-        // }
+        }  // else { return $this->json(['result' => 'not submitted??']) ; }
     }
 
     /**
