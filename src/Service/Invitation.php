@@ -210,6 +210,7 @@ class Invitation
                     'expires_at' => date('Y-m-d+H:iP', strtotime("tomorrow 9:00 am")),
                 ],
             ]);
+            $this->logger->info("sent invitation",(array)$data);
             $data = json_decode((string)$res->getBody());
             return $data;
 
@@ -225,7 +226,8 @@ class Invitation
             if (stristr($response['error'],'422 Unprocessable')) {
                 $response['message'] = "It appears that $email already has a user account on NAJIT's Discourse site";
             } else {
-                $response['message'] = "An unexpected application error happened. Please try again later.";
+                $response['message'] = "An unexpected application error happened. Please try again later. Fuckin shit?";
+                $this->logger->error("shit happened",['response'=>$response]);
             }
             return (object)$response;
         }
