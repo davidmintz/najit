@@ -31,6 +31,7 @@ const request_invitation = function(email) {
     $.post(base_path+"/invite",{email})
     .then(response=>{
         if (response.result.error && response.result.message) {
+            console.warn(response.result.error);
             status.append(
                 `<br><span class="text-warning fas fa-exclamation-triangle"></span> ${response.result.message}`
             );
@@ -38,14 +39,17 @@ const request_invitation = function(email) {
         }
         // all should be well
         if (response.result.emailed) {
-            status.append(`<br><span class="text-success fas fa-check"></span> An invitation has been sent. 
-                Please check your inbox in a couple minutes!`);
-        }
+            status.append(`<br><span class="text-success fas fa-check"></span> An invitation has been sent to 
+            <strong>${email.toLowerCase()}</strong> Please check that inbox in a couple minutes!`);
+            $("#email").val("");
+         }
     })
     .fail(response=>{
         $("#status").html(
             `<br><span class="text-warning fas fa-exclamation-triangle"></span> An unexpected application error happened. Please try again later`
         );
+        // console.warn(response.result.error);
+            
     });
 
 };
@@ -58,13 +62,11 @@ $(function() {
     btn.on("click",function(e){
         e.preventDefault();
         spinner.removeAttr("hidden");
-        // takingcare@live.com 
-        // dheman_abdi@yahoo.com
-
+        // takingcare@live.com  dheman_abdi@yahoo.com
         status.removeClass("bg-warning").html("searching... ");
         $.post(base_path+"/verify",$("form").serialize())
         .then(response=>{ 
-            // check if there are validation errors;
+            // check for validation errors;
             if (! response.valid) {
                 status.empty();
                 var keys = Object.keys(response.messages);
